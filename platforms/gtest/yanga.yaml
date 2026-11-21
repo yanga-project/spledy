@@ -29,6 +29,7 @@ platforms:
             resolvers:
               default: [gcovr]
               local: [gcovr, vscode]
+              ci: [gcovr, repository]
     configs:
       - id: west
         content:

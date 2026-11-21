@@ -60,7 +60,7 @@
     <h1>{{ overview.project_name }}</h1>
     <div class="meta">
       {%- if overview.commit %}
-      <span>Commit <b><code>{{ overview.commit[:7] }}</code></b></span>
+      <span>Commit <b>{% if overview.repository_url %}<a href="{{ overview.repository_url }}/commit/{{ overview.commit }}"><code>{{ overview.commit[:7] }}</code></a>{% else %}<code>{{ overview.commit[:7] }}</code>{% endif %}</b></span>
       {%- endif %}
       <span>Generated <b>{{ overview.generated_at[:16] | replace("T", " ") }} UTC</b></span>
       {%- for entry in overview.documentation %}
@@ -119,7 +119,9 @@
   </section>
 
   <footer>
-    <a href="https://github.com/cuinixam/SPLed#readme">README</a><a href="https://github.com/cuinixam/SPLed">Repository</a>
+    {%- if overview.repository_url %}
+    <a href="{{ overview.repository_url }}#readme">README</a><a href="{{ overview.repository_url }}">Repository</a>
+    {%- endif %}
   </footer>
 </div>
 </body>

@@ -1,0 +1,2 @@
+/* Room below the last element, so a jump to it can place it at the top of the window. */
+.rst-content .document { padding-bottom: 100vh; }

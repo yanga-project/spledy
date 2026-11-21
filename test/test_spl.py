@@ -62,3 +62,17 @@ def test_overview_links_every_build(overview_file: Path) -> None:
     for variant, platform in BUILDS:
         assert any(link.startswith(f"variants/{variant}/{platform}/") for link in variant_links), f"No link for {variant} on {platform}"
     assert 'class="commit-mismatch"' not in html, "Every build in this run must come from the current commit"
+
+
+def test_overview_links_the_commit_and_the_footer_to_the_repository(overview_file: Path, repository_url: str, head_commit: str) -> None:
+    # Arrange
+    html = overview_file.read_text(encoding="utf-8")
+
+    # Act
+    footer_links = dict((text, href) for href, text in re.findall(r'<a\b[^>]*\bhref="([^"]+)"[^>]*>(README|Repository)</a>', html))
+
+    # Assert
+    assert f'href="{repository_url}/commit/{head_commit}"' in html, "The commit does not link to its commit page"
+    assert footer_links.keys() == {"README", "Repository"}, footer_links
+    assert all(href.startswith(repository_url) for href in footer_links.values()), footer_links
+    assert not re.search(r"github\.com/cuinixam/SPLed\b", html), "The overview still links the old repository"

@@ -22,6 +22,9 @@ pipeline:
   # every other platform, and Zephyr's Kconfig no longer sees the product's symbols.
   - step: KConfigGen
     module: yanga_core.steps.kconfig_gen
+  # The report generator picks the ci or local source link profile from it.
+  - step: CheckCIContext
+    module: pypeline_semantic_release.check_ci_context
   - step: GenerateBuildSystemFiles
     module: yanga.cmake.steps
   # Reads what the generators registered, so it comes after GenerateBuildSystemFiles.

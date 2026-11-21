@@ -86,10 +86,9 @@ html_theme_options = {
 
 html_logo = "doc/_figures/SPLED_logo.png"
 
-# Copy the standalone CI pipeline page into the report output as-is.
-# It is referenced from the toctree as `CI Pipeline <./ci_pipeline.html#http://>`
-# and the fix_html_links step rewrites the link to the correct relative path.
-html_extra_path = ["doc/ci_pipeline.html"]
+# The bottom spacer lets a jump put any test result, also the last on a page, at the top of the window.
+html_static_path = ["doc/_static"]
+html_css_files = ["bottom_spacer.css"]
 
 # extensions and their configuration #########################################
 extensions = []
@@ -136,6 +135,8 @@ needs_types = [
 
 # Define own link types
 needs_links = {
+    # sphinx-test-reports links a test result to its suite and its file with the default link type.
+    "links": {"incoming": "contains", "outgoing": "is part of"},
     # SWE.3 BP.5: link from Implementation (Software unit) to Specification (Software detailed design)
     # AND
     # SWE.2 BP.7: link from Requirements (Software Requirement) to Architecture (Software Architecture)

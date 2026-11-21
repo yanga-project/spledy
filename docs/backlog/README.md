@@ -10,6 +10,8 @@
 
 ### In Progress
 
+- [SPLED-004 — Report cleanup: code host links, components by folder, readable test results](spled-004.md)
+
 ### Blocked
 
 ### Ready

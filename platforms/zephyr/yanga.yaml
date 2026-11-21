@@ -77,6 +77,11 @@ platforms:
         module: yanga.cmake.targets_data
       - step: ReportCMakeGenerator
         module: yanga.cmake.reports
+        config:
+          source_links: true
+          resolvers:
+            default: [vscode]
+            ci: [repository]
     pipeline:
       - include: pipeline/zephyr.yaml
       - step: ZephyrBuild
@@ -131,6 +136,11 @@ platforms:
         module: yanga.cmake.targets_data
       - step: ReportCMakeGenerator
         module: yanga.cmake.reports
+        config:
+          source_links: true
+          resolvers:
+            default: [vscode]
+            ci: [repository]
     pipeline:
       - include: pipeline/zephyr.yaml
       # Espressif ships the radio firmware as binary blobs kept out of git. The
@@ -182,6 +192,11 @@ platforms:
         module: yanga.cmake.targets_data
       - step: ReportCMakeGenerator
         module: yanga.cmake.reports
+        config:
+          source_links: true
+          resolvers:
+            default: [vscode]
+            ci: [repository]
     pipeline:
       - include: pipeline/zephyr.yaml
       - step: FetchEspressifBlobs
