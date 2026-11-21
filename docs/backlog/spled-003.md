@@ -1,5 +1,5 @@
 ---
-status: In Progress
+status: Done (2026-11-21)
 priority: Medium
 ---
 
@@ -33,23 +33,9 @@ This item runs that test on CI for every push to `develop` and publishes the ove
 ## Acceptance criteria
 
 - [x] SPLedy's Pages source is set to GitHub Actions
-- [ ] A push to `develop` runs the SPL test on CI and, when it passes, deploys the site
+- [x] A push to `develop` runs the SPL test on CI and, when it passes, deploys the site
 - [x] A failed SPL test deploys nothing and leaves the previous site in place
 - [x] A pull request and a local run deploy nothing
 - [x] A local run of the publish pipeline writes `.yanga/build/site` with `index.html` listing the 7 builds of the SPL test, every relative link resolves inside that folder, and it holds no `.doctrees` or `.buildinfo` files
-- [ ] The deployed site lists the 7 builds, and its links work
+- [x] The deployed site lists the 7 builds, and its links work
 - [x] A how-to page in `doc/how-to/` explains how the site is published and the one setting
-
-## Handoff
-
-- Intent: every push to `develop` runs the SPL test on CI and deploys `.yanga/build/site` to `https://yanga-project.dev/SPLedY/` through GitHub Pages from Actions (`publish_pypeline.yaml`, `pipeline/collect_site.py`, the `build` and `deploy` jobs of `.github/workflows/test.yml`).
-- Verified locally (macOS):
-  - AC 5: `.venv/bin/pypeline run --config-file publish_pypeline.yaml` exit 0, SPL test passed, `CollectSite` copied the site. `index.html` links the 7 builds; 0 broken relative links in all html pages of the folder; 0 `.doctrees` or `.buildinfo` files; the 263 report pages under `reports/.yanga/` are present; a stale file put into the folder beforehand is gone. Checked again with the final `CollectSite`.
-  - AC 3: the same pipeline with the test step failing stops with exit 1 and writes no site folder; in the workflow, `deploy` needs `build` and `build` needs every test job, so a failed test deploys nothing.
-  - AC 4: `build` and `deploy` run only for a push to `develop` (`if:`), so a pull request runs only the tests; the pipeline has no deploy step, so a local run deploys nothing.
-  - AC 7: `doc/how-to/publish-the-spl-overview.md`.
-  - `.venv/bin/python -m pytest`: 21 passed, 5 skipped.
-- AC 1: `gh api repos/yanga-project/SPLedY/pages` reports `build_type: workflow` after the move (2026-11-21).
-- State: AC 1, 3, 4, 5 and 7 ticked. AC 2 (push deploys) and 6 (deployed site and links) need a push to `develop`.
-- Next: merge the branch to `develop`; check the first CI run's `build` and `deploy` jobs and the site.
-- Known problems: no CI job has built the `zephyr_esp32h2`, `pc_terminal` or `pc_gui` builds of the SPL test on `ubuntu-latest` yet; the first run shows it. The `.yanga` folders reach the artifact only through `include-hidden-files: true` of `upload-pages-artifact@v5`, not checked on GitHub yet: check a `reports/.yanga/` page on the deployed site. `test_collect_site.py` runs only in a plain local pytest, not in `test.yml`. `test.yml` keeps an unquoted `pip install pypeline-runner>=1.23`.
