@@ -21,6 +21,7 @@
 
 /doc/customer_requirements/index
 /doc/software_architecture/index
+/doc/platforms/index
 ```
 
 {% else %}
@@ -36,10 +37,19 @@
 :maxdepth: 3
 :caption: Contents
 
+/doc/customer_requirements/index
 /doc/software_architecture/index
 /doc/components
-/doc/platforms/index
-{% for file in report_data.get_variant_files_list() %}
+{% if report_data.files("container") %}
+/doc/containers
+{% endif %}
+{% for file in report_data.files("variant", "configuration") %}
+{{ file }}
+{% endfor %}
+{% if report_data.files("merged") or report_data.files("variant", "test") or report_data.files("variant", "coverage") or report_data.files("overall") %}
+/doc/reports
+{% endif %}
+{% for file in report_data.untagged() %}
 {{ file }}
 {% endfor %}
 

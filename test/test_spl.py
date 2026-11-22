@@ -76,3 +76,29 @@ def test_overview_links_the_commit_and_the_footer_to_the_repository(overview_fil
     assert footer_links.keys() == {"README", "Repository"}, footer_links
     assert all(href.startswith(repository_url) for href in footer_links.values()), footer_links
     assert not re.search(r"github\.com/cuinixam/SPLed\b", html), "The overview still links the old repository"
+
+
+def test_product_line_documentation_has_the_platform_pages(overview_file: Path) -> None:
+    # Arrange
+    doc = overview_file.parent / "spl/reports"
+
+    # Act
+    index = (doc / "index.html").read_text(encoding="utf-8")
+    platforms = (doc / "doc/platforms/index.html").read_text(encoding="utf-8")
+
+    # Assert
+    assert 'href="doc/platforms/index.html"' in index, "The product line documentation does not link the Platforms page"
+    assert "tapi error" not in platforms, "The macOS troubleshooting is still on the Platforms page"
+    assert (doc / "doc/how-to/fix-the-macos-tapi-error.html").is_file()
+
+
+def test_overview_shows_the_product_line_documentation_above_the_variants(overview_file: Path) -> None:
+    # Arrange
+    html = overview_file.read_text(encoding="utf-8")
+
+    # Act
+    heading = re.search(r"<h[1-6]\b[^>]*>\s*Product line documentation\s*</h[1-6]>", html)
+
+    # Assert
+    assert heading, "The overview has no Product line documentation section"
+    assert heading.start() < html.index('<article class="card"'), "Product line documentation is not above the variant cards"

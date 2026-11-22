@@ -42,6 +42,9 @@ html_context: dict[str, Any] = {
 include_patterns = ["index.md", "doc/**"]
 
 report_config = SphinxConfig()
+# The platform pages describe the whole product line, so only the product line report has them.
+if report_config.report_data and not report_config.report_data.has_spl_scope:
+    exclude_patterns.append("doc/platforms/**")
 html_context.update(report_config.html_context)
 include_patterns.extend(report_config.include_patterns)
 

@@ -34,11 +34,9 @@
   .card { background: var(--card); border: 1px solid var(--line); border-radius: 12px;
           padding: 18px 20px; display: flex; flex-direction: column; gap: 12px; }
   .card h2 { margin: 0; font-size: 19px; }
+  .docs { margin-bottom: 24px; }
   .desc { margin: 0; color: var(--muted); }
   .label { font-size: 12px; text-transform: uppercase; letter-spacing: .04em; color: var(--muted); margin-bottom: 4px; }
-  .features { display: flex; flex-wrap: wrap; gap: 6px; }
-  .feature { font: 12px/1.6 ui-monospace, SFMono-Regular, Menlo, monospace;
-             border: 1px solid var(--line); border-radius: 6px; padding: 0 6px; }
   table { width: 100%; border-collapse: collapse; font-size: 14px; }
   td { padding: 6px 0; border-top: 1px solid var(--line); vertical-align: top; }
   td.when { color: var(--muted); text-align: right; white-space: nowrap; font-size: 13px; }
@@ -63,9 +61,6 @@
       <span>Commit <b>{% if overview.repository_url %}<a href="{{ overview.repository_url }}/commit/{{ overview.commit }}"><code>{{ overview.commit[:7] }}</code></a>{% else %}<code>{{ overview.commit[:7] }}</code>{% endif %}</b></span>
       {%- endif %}
       <span>Generated <b>{{ overview.generated_at[:16] | replace("T", " ") }} UTC</b></span>
-      {%- for entry in overview.documentation %}
-      <span><a class="report" href="{{ entry.link }}" target="_blank" rel="noopener">{{ entry.name }}</a></span>
-      {%- endfor %}
     </div>
   </header>
 
@@ -75,22 +70,23 @@
     <div class="stat"><div class="n">{{ overview.variants | sum(attribute="builds", start=[]) | length }}</div><div class="l">builds</div></div>
   </section>
 
+  {%- if overview.documentation %}
+  <section class="card docs">
+    <h2>Product line documentation</h2>
+    <div class="sections">
+      {%- for entry in overview.documentation %}
+      <a class="report" href="{{ entry.link }}" target="_blank" rel="noopener">{{ entry.name }}</a>
+      {%- endfor %}
+    </div>
+  </section>
+  {%- endif %}
+
   <section class="grid">
   {%- for variant in overview.variants %}
     <article class="card">
       <h2>{{ variant.name }}</h2>
       {%- if variant.description %}
       <p class="desc">{{ variant.description }}</p>
-      {%- endif %}
-      {%- if variant.features %}
-      <div>
-        <div class="label">Features</div>
-        <div class="features">
-          {%- for name, value in variant.features.items() if value is not false %}
-          <span class="feature">{{ name }}={{ "y" if value is true else value }}</span>
-          {%- endfor %}
-        </div>
-      </div>
       {%- endif %}
       <div>
         <div class="label">Builds</div>
