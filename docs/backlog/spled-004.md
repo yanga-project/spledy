@@ -1,5 +1,5 @@
 ---
-status: In Progress
+status: Done (2026-11-23)
 priority: Medium
 blocked_by: [YANGA-009, YCORE-004]
 related: [SPLED-001, SPLED-003]
@@ -34,7 +34,7 @@ Found in the published report of develop:
 
 ## Acceptance criteria
 
-- [ ] On CI, the Zephyr and gtest source pages, test sources included, link to the repository at the build's commit; a local build links to the local files as before
+- [x] On CI, the Zephyr and gtest source pages, test sources included, link to the repository at the build's commit; a local build links to the local files as before
 - [x] The SPL overview links the commit and the footer to the detected repository
 - [x] The components page shows the components in a folder tree by their path, and a separate list of containers with their subcomponents; no container is an empty chapter
 - [x] A test result no longer shows "links outgoing"
