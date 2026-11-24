@@ -86,6 +86,9 @@ components:
   - framework: gtest
     sources:
     - test/test_light_controller.cc
+  - framework: pytest
+    sources:
+    - test/test_light_controller.py
   include_directories:
   - path: src
     scope: PUBLIC
@@ -101,6 +104,9 @@ components:
   - framework: gtest
     sources:
     - test/test_power_button.cc
+  - framework: pytest
+    sources:
+    - test/test_power_button.py
   include_directories:
   - path: src
     scope: PUBLIC
@@ -152,6 +158,9 @@ components:
   - framework: gtest
     sources:
     - spled/test/test_spled_integration.cc
+  - framework: pytest
+    sources:
+    - spled/test/test_spled_integration.py
   required_components:
   - rte
   - spled

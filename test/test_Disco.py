@@ -19,11 +19,13 @@ LIGHT_GREEN = "#008000"
 COVERAGE_LINK = re.compile(r'<a\b[^>]*\bhref="([^"#]*coverage/[^"#]*\.html)#[lL](\d+)"[^>]*>([^<]*):(\d+)</a>')
 VSCODE_LINK = re.compile(r'href="vscode://file/([^"]*):(\d+)"')
 # The source docs pages of light_controller, relative to a report directory.
-LIGHT_CONTROLLER_PAGES = Path(".yanga/build/variants", VARIANT_NAME, "gtest/light_controller")
+LIGHT_CONTROLLER_PAGES = Path(".yanga/build/variants", VARIANT_NAME, "test/light_controller")
 # The build picks the resolver profile with CheckCIContext; detect CI the same way.
 IS_CI = any(detector.detect() for system in CISystem if (detector := system.get_detector()))
-# The Reports page's link to the variant test coverage page, as sphinx renders the toctree entry.
-VARIANT_TEST_COVERAGE_LINK = re.compile(r'<a\b[^>]*\bhref="\.\./variant_test_coverage/index\.html"')
+# The Reports page's link to the variant's Coverage page, as sphinx renders the toctree entry.
+VARIANT_COVERAGE_PAGE_LINK = re.compile(r'<a\b[^>]*\bhref="\.\./([^"]*/variant_test_coverage\.html)"')
+# The Coverage page's link to the gcovr report of the variant test.
+VARIANT_TEST_COVERAGE_LINK = re.compile(r'<a\b[^>]*\bhref="(?:\.\./)+variant_test_coverage/index\.html"')
 # The tokens that give a sphinx page its section nesting: a section opens, a section closes, a heading names it.
 SECTION_TOKEN = re.compile(r"<section\b[^>]*>|</section>|<h[1-6]\b[^>]*>([^<]*)")
 TAG = re.compile(r"<[^>]+>")
@@ -62,19 +64,19 @@ def variant() -> Variant:
 
 
 @pytest.fixture(scope="module")
-def gtest_build_dir() -> Path:
-    """Build the variant report and the light_controller component report on gtest."""
+def test_platform_build_dir() -> Path:
+    """Build the variant report and the light_controller component report on the test platform."""
     for target in ("report", "light_controller_report"):
         config = RunCommandConfig(
             project_dir=Path.cwd(),
-            platform="gtest",
+            platform="test",
             variant_name=VARIANT_NAME,
             not_interactive=True,
             target=target,
         )
         assert RunCommand().do_run(config) == 0, f"Building {target} failed"
 
-    return Path.cwd() / ".yanga/build/variants" / VARIANT_NAME / "gtest"
+    return Path.cwd() / ".yanga/build/variants" / VARIANT_NAME / "test"
 
 
 @pytest.fixture(scope="module")
@@ -115,7 +117,7 @@ class Test_Disco:
         [
             ("pc_terminal", "report"),
             ("pc_gui", "report"),
-            ("gtest", "report"),
+            ("test", "report"),
             # The riscv64 toolchain comes from poks on every OS; native_sim needs a Linux host.
             pytest.param("zephyr_sim", "all", marks=pytest.mark.skipif(sys.platform != "linux", reason="native_sim is Linux-only")),
             ("zephyr_esp32h2", "all"),
@@ -154,9 +156,9 @@ class Test_Disco:
         assert variant.led_colour() == LIGHT_GREEN
 
     @pytest.mark.parametrize("report", ["reports", "light_controller/reports"])
-    def test_gtest_source_docs_link_to_coverage_lines(self, gtest_build_dir: Path, report: str):
+    def test_platform_source_docs_link_to_coverage_lines(self, test_platform_build_dir: Path, report: str):
         # Arrange
-        page = gtest_build_dir / report / LIGHT_CONTROLLER_PAGES / "light_controller.c.html"
+        page = test_platform_build_dir / report / LIGHT_CONTROLLER_PAGES / "light_controller.c.html"
 
         # Act
         html = page.read_text(encoding="utf-8")
@@ -175,26 +177,29 @@ class Test_Disco:
         assert 'href="source:' not in html, "An unresolved source: link is left"
         assert 'href="vscode://' not in html, "A production declaration fell back to VS Code"
 
-    def test_gtest_variant_test_runs_and_reports_its_coverage(self, gtest_build_dir: Path):
+    def test_platform_variant_test_runs_and_reports_its_coverage(self, test_platform_build_dir: Path):
         # Arrange
-        junit = gtest_build_dir / "variant_test/variant_test_junit.xml"
-        coverage_page = gtest_build_dir / "reports/variant_test_coverage/index.html"
+        junit = test_platform_build_dir / "variant_test/variant_test_junit.xml"
+        coverage_page = test_platform_build_dir / "reports/variant_test_coverage/index.html"
 
         # Act
         suites = ElementTree.parse(junit).getroot()
-        report = (gtest_build_dir / "reports/doc/reports.html").read_text(encoding="utf-8")
+        report = (test_platform_build_dir / "reports/doc/reports.html").read_text(encoding="utf-8")
 
         # Assert
         assert int(suites.get("tests", 0)) > 0, f"No variant test ran in {junit}"
         assert suites.get("failures") == "0" and suites.get("errors") == "0", f"The variant test failed, see {junit}"
         # gcovr's nested report gives each covered file its own page next to the index.
         assert any(coverage_page.parent.glob("index.spled.c.*.html")), f"spled.c is missing from {coverage_page.parent}"
-        assert VARIANT_TEST_COVERAGE_LINK.search(report), "The Reports page does not link to the variant test coverage"
+        coverage_link = VARIANT_COVERAGE_PAGE_LINK.search(report)
+        assert coverage_link, "The Reports page does not link to the variant's Coverage page"
+        variant_coverage = (test_platform_build_dir / "reports" / coverage_link.group(1)).read_text(encoding="utf-8")
+        assert VARIANT_TEST_COVERAGE_LINK.search(variant_coverage), "The variant's Coverage page does not link to the variant test coverage"
 
     @pytest.mark.parametrize(
         ("build_dir_fixture", "page_name", "source"),
         [
-            ("gtest_build_dir", "test_light_controller.cc.html", "components/light_controller/test/test_light_controller.cc"),
+            ("test_platform_build_dir", "test_light_controller.cc.html", "components/light_controller/test/test_light_controller.cc"),
             ("zephyr_build_dir", "light_controller.c.html", "components/light_controller/src/light_controller.c"),
         ],
     )
@@ -222,9 +227,9 @@ class Test_Disco:
             for path, line in VSCODE_LINK.findall(html)
         ), f"No declaration links to VS Code at a line of {source} in {page}"
 
-    def test_gtest_components_page_shows_a_folder_tree_without_the_containers(self, gtest_build_dir: Path):
+    def test_platform_components_page_shows_a_folder_tree_without_the_containers(self, test_platform_build_dir: Path):
         # Arrange
-        html = (gtest_build_dir / "reports/doc/components.html").read_text(encoding="utf-8")
+        html = (test_platform_build_dir / "reports/doc/components.html").read_text(encoding="utf-8")
 
         # Act
         # Every section as its heading and the headings it is nested in.
@@ -251,9 +256,9 @@ class Test_Disco:
             ("test_integrations_spled", "Integrates", ["spled", "rte", "brightness_controller", "power_signal_processing", "light_controller", "power_button", "main_control_knob"]),
         ],
     )
-    def test_gtest_containers_page_lists_the_parts_of(self, gtest_build_dir: Path, component: str, label: str, names: list[str]):
+    def test_platform_containers_page_lists_the_parts_of(self, test_platform_build_dir: Path, component: str, label: str, names: list[str]):
         # Arrange
-        page = gtest_build_dir / "reports/doc/containers.html"
+        page = test_platform_build_dir / "reports/doc/containers.html"
 
         # Act
         text = TAG.sub(" ", page.read_text(encoding="utf-8"))
@@ -263,9 +268,9 @@ class Test_Disco:
         assert parts, f"{component} has no {label} line in {page}"
         assert re.findall(r"\w+", parts.group(1)) == names
 
-    def test_gtest_test_results_do_not_show_links_outgoing(self, gtest_build_dir: Path):
+    def test_platform_test_results_do_not_show_links_outgoing(self, test_platform_build_dir: Path):
         # Arrange
-        pages = list((gtest_build_dir / "reports").rglob("*_test_report.html"))
+        pages = list((test_platform_build_dir / "reports").rglob("*_test_report.html"))
 
         # Act
         texts = {page: page.read_text(encoding="utf-8") for page in pages}
@@ -277,9 +282,9 @@ class Test_Disco:
         assert showing == []
         assert unlinked == [], "These test result pages do not link their suite"
 
-    def test_gtest_report_has_no_ci_pipeline_page(self, gtest_build_dir: Path):
+    def test_platform_report_has_no_ci_pipeline_page(self, test_platform_build_dir: Path):
         # Arrange
-        reports = gtest_build_dir / "reports"
+        reports = test_platform_build_dir / "reports"
 
         # Act
         index = (reports / "index.html").read_text(encoding="utf-8")
@@ -288,9 +293,9 @@ class Test_Disco:
         assert not (reports / "ci_pipeline.html").exists()
         assert "ci_pipeline.html" not in index
 
-    def test_gtest_report_contents_are_ordered_by_purpose(self, gtest_build_dir: Path):
+    def test_platform_report_contents_are_ordered_by_purpose(self, test_platform_build_dir: Path):
         # Arrange
-        html = (gtest_build_dir / "reports/index.html").read_text(encoding="utf-8")
+        html = (test_platform_build_dir / "reports/index.html").read_text(encoding="utf-8")
 
         # Act
         # The toctree in the page body, not its copy in the navigation sidebar.
@@ -308,7 +313,7 @@ class Test_Disco:
             "Build Targets",
         ]
         assert "platforms/" not in contents, "The variant report links a platform page"
-        assert not list((gtest_build_dir / "reports/doc/platforms").glob("**/*.html")), "The variant report builds platform pages"
+        assert not list((test_platform_build_dir / "reports/doc/platforms").glob("**/*.html")), "The variant report builds platform pages"
 
     @pytest.mark.parametrize(
         ("page", "chapter"),
@@ -318,9 +323,9 @@ class Test_Disco:
             ("doc/containers.html", "test_integrations_spled"),
         ],
     )
-    def test_gtest_chapter_links_only_its_own_pages(self, gtest_build_dir: Path, page: str, chapter: str):
+    def test_platform_chapter_links_only_its_own_pages(self, test_platform_build_dir: Path, page: str, chapter: str):
         # Arrange
-        html = (gtest_build_dir / "reports" / page).read_text(encoding="utf-8")
+        html = (test_platform_build_dir / "reports" / page).read_text(encoding="utf-8")
 
         # Act
         links = re.findall(r'<a\b[^>]*\bclass="reference[^"]*"[^>]*\bhref="([^"#]+)', chapter_html(html, chapter))
@@ -334,12 +339,12 @@ class Test_Disco:
         [
             ("pc_terminal_build_dir", "doc/components.html", "light_controller", ["Software Detailed Design", "Sources"]),
             (
-                "gtest_build_dir",
+                "test_platform_build_dir",
                 "doc/components.html",
                 "light_controller",
                 ["Software Detailed Design", "Sources", "Test Results", "Coverage", "Static Analysis"],
             ),
-            ("gtest_build_dir", "doc/containers.html", "test_integrations_spled", ["Sources", "Test Results", "Coverage"]),
+            ("test_platform_build_dir", "doc/containers.html", "test_integrations_spled", ["Sources", "Test Results", "Coverage"]),
         ],
     )
     def test_chapter_lists_its_pages_by_kind(self, request: pytest.FixtureRequest, build_dir_fixture: str, page: str, chapter: str, titles: list[str]):
@@ -352,9 +357,9 @@ class Test_Disco:
         # Assert
         assert [TAG.sub("", link) for link in links] == titles
 
-    def test_gtest_reports_page_has_the_merged_variant_and_overall_results(self, gtest_build_dir: Path):
+    def test_platform_reports_page_has_the_merged_variant_and_overall_results(self, test_platform_build_dir: Path):
         # Arrange
-        html = (gtest_build_dir / "reports/doc/reports.html").read_text(encoding="utf-8")
+        html = (test_platform_build_dir / "reports/doc/reports.html").read_text(encoding="utf-8")
 
         # Act
         sections = re.findall(r"<h2\b[^>]*>([^<]*)<", html)

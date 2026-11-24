@@ -6,7 +6,7 @@ same on every row. Select one with `yanga run --variant <variant> --platform <pl
 
 | Platform | What it builds |
 | --- | --- |
-| `gtest` | Build and run the components' GoogleTest tests |
+| `test` | Build and run the components' gtest and pytest tests |
 | `pc_terminal` | PC terminal executable with clang (Windows/Linux) |
 | `pc_gui` | The variant as a shared library for the Python GUI and for tests (Windows/Linux/macOS) |
 | `arduino_uno_r3` | Arduino Uno R3 with avr-gcc |

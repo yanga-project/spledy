@@ -1,7 +1,7 @@
 [
   {
-    "name": "gtest",
-    "toolchainFile": "platforms/gtest/gcc.cmake"
+    "name": "test",
+    "toolchainFile": "platforms/test/gcc.cmake"
   },
   {
     "name": "win_exe",

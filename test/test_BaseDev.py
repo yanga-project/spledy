@@ -11,7 +11,7 @@ class Test_BaseDev:
         # Arrange
         config = RunCommandConfig(
             project_dir=Path.cwd(),
-            platform="gtest",
+            platform="test",
             variant_name=self.variant_name,
             not_interactive=True,
         )

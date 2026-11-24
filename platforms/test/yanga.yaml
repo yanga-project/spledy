@@ -1,7 +1,7 @@
 platforms:
   # Execute tests with GoogleTest framework
-  - name: gtest
-    description: Build and run components GTest tests
+  - name: test
+    description: Build and run the components' gtest and pytest tests
     build_targets:
       generic: [report, coverage, lint]
       variant: [all]
@@ -14,6 +14,15 @@ platforms:
               strict: false
               exclude_symbol_patterns:
                 - "_*"
+      - step: PytestCMakeGenerator
+        module: yanga.cmake.pytest
+        config:
+            mocking:
+              strict: false
+              exclude_symbol_patterns:
+                - "_*"
+      - step: TestResultsCMakeGenerator
+        module: yanga.cmake.test_results
       #- step: CppCheckCMakeGenerator
       #  module: yanga.cmake.cppcheck
       - step: ClangTidyCMakeGenerator
@@ -43,6 +52,6 @@ platforms:
                 revision: v1.17.0
                 path: gtest
       - id: poks
-        file: platforms/gtest/poks.json
+        file: platforms/test/poks.json
       - id: toolchain
-        file: "platforms/gtest/gcc.cmake"
+        file: "platforms/test/gcc.cmake"

@@ -2,7 +2,7 @@
 
 ## Project Overview
 
-**SPLed** is a Software Product Line (SPL) demonstration for embedded/desktop systems built with the [Yanga](https://github.com/cuinixam/yanga) build system. It showcases managing multiple **variants** (Disco, Sleep, Spa) with different features and platform targets (Arduino, Windows EXE, GTest).
+**SPLed** is a Software Product Line (SPL) demonstration for embedded/desktop systems built with the [Yanga](https://github.com/cuinixam/yanga) build system. It showcases managing multiple **variants** (Disco, Sleep, Spa) with different features and platform targets (Arduino, Windows EXE, test).
 
 ## Core Architecture
 
@@ -10,7 +10,7 @@
 
 1. **Components** (`components/`) - Reusable C modules (e.g., `spled`, `light_controller`, `power_button`, `rte`)
 2. **Variants** (`variants/`) - Product configurations combining components with feature selections
-3. **Platforms** (`platforms/`) - Target-specific implementations (Arduino, GTest, Win32)
+3. **Platforms** (`platforms/`) - Target-specific implementations (Arduino, test, Win32)
 
 ### Key Concepts
 
@@ -78,8 +78,8 @@ Terminal use of the same image, and the wrinkles that come with it, are in
 # Integration tests (Python-based, builds variants)
 pytest test/test_Disco.py      # Test Disco variant on all platforms
 
-# Unit tests (C++ GoogleTest, requires GTest platform build)
-.\yanga.ps1 run --variant Spa --platform gtest --target all
+# Unit tests (C++ GoogleTest and pytest, requires the test platform build)
+.\yanga.ps1 run --variant Spa --platform test --target all
 ```
 
 ### Feature Configuration
@@ -132,7 +132,7 @@ variants:
   - framework: gtest
     sources: [test_myvariant.cc]  # variant test, next to this yaml file
   platforms:
-    gtest:
+    test:
       components: [test_integrations_spled]  # Platform-specific components
     arduino_uno_r3:
       components: [arduino_button, arduino_led]
@@ -140,7 +140,7 @@ variants:
 
 ### Platform Toolchain Setup
 
-- **GTest**: Uses GoogleTest from West manifest, generates coverage/lint/report targets
+- **test**: Uses GoogleTest from West manifest and pytest, generates coverage/lint/report targets
 - **Arduino**: Cross-compiles with AVR-GCC, includes Arduino Core from West
 - **pc_terminal**: Native PC terminal builds with Clang (Windows/Linux)
 
@@ -153,7 +153,7 @@ from yanga_core.commands.run import RunCommand, RunCommandConfig
 
 config = RunCommandConfig(
     project_dir=Path.cwd(),
-    platform="gtest",
+    platform="test",
     variant_name="Disco",
     not_interactive=True,
     target="report"
@@ -197,7 +197,7 @@ Reports aggregate test results, coverage, and docs:
 - [yanga.yaml](yanga.yaml) - Project build pipeline
 - [KConfig](KConfig) - Feature model definition
 - [components/yanga.yaml](components/yanga.yaml) - Component declarations
-- [platforms/gtest/yanga.yaml](platforms/gtest/yanga.yaml) - GTest platform config
+- [platforms/test/yanga.yaml](platforms/test/yanga.yaml) - test platform config (gtest and pytest)
 - [variants/Disco/config.txt](variants/Disco/config.txt) - Example feature selection
 - [build.ps1](build.ps1) - Bootstrap and environment script
 

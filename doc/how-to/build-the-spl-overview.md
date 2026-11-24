@@ -11,7 +11,7 @@ writes `publish_manifest.json` into the variant build folder. Build the `report`
 the overview links only reports for now:
 
 ```bash
-yanga run --variant Disco --platform gtest --target report
+yanga run --variant Disco --platform test --target report
 yanga run --variant Disco --platform pc_terminal --build-type Debug --target report
 ```
 

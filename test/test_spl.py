@@ -14,12 +14,12 @@ import pytest
 from yanga_core.commands.run import RunCommand, RunCommandConfig
 
 BUILDS = [
-    ("Disco", "gtest"),
+    ("Disco", "test"),
     ("Disco", "pc_terminal"),
     ("Disco", "zephyr_esp32h2"),
-    ("Sleep", "gtest"),
+    ("Sleep", "test"),
     ("Sleep", "pc_terminal"),
-    ("Spa", "gtest"),
+    ("Spa", "test"),
     ("Spa", "pc_gui"),
 ]
 

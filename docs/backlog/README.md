@@ -14,8 +14,6 @@
 
 ### Ready
 
-- [SPLED-005 — MVP of pytest tests for a component and a variant](spled-005.md)
-
 ---
 
 ## Notes

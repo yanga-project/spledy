@@ -16,5 +16,5 @@ step of a pipeline run takes the linker and the SDK from the Command Line Tools,
 - The Command Line Tools must be installed (`xcode-select --install`); Xcode alone is not enough.
 - A shell outside the pipeline gets the same setting from `.yanga/build/install/env_setup.sh`.
 
-The `gtest` gcc does not parse the SDK 26.x headers (`mach/message.h`); it works with SDK 15.x
+The `test` platform's gcc does not parse the SDK 26.x headers (`mach/message.h`); it works with SDK 15.x
 and 27, and prefers a 15.x SDK from the Command Line Tools when one is installed.

@@ -14,7 +14,7 @@ class Test_Sleep:
         [
             ("pc_terminal", "report"),
             ("pc_gui", "report"),
-            ("gtest", "report"),
+            ("test", "report"),
             # The riscv64 toolchain comes from poks on every OS; native_sim needs a Linux host.
             pytest.param("zephyr_sim", "all", marks=pytest.mark.skipif(sys.platform != "linux", reason="native_sim is Linux-only")),
             ("zephyr_esp32h2", "all"),

@@ -1,7 +1,7 @@
 ---
-status: Ready
+status: Superseded (2026-11-24)
 priority: Medium
-blocked_by: [YANGA-010]
+related: [SPLED-008]
 ---
 
 # [SPLED-005] MVP of pytest tests for a component and a variant

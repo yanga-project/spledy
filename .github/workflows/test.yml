@@ -22,9 +22,9 @@ jobs:
           - variant: Disco
             tests: Test_Disco and not zephyr_sim and not waveshare
           - variant: Sleep
-            tests: Test_Sleep and gtest
+            tests: Test_Sleep and test-report
           - variant: Spa
-            tests: Test_Spa and (gtest or arduino_uno_r3)
+            tests: Test_Spa and (test-report or arduino_uno_r3)
 
     steps:
       - name: Checkout Code
@@ -49,13 +49,13 @@ jobs:
             tests: Test_Disco and not zephyr_sim and not waveshare
           - os: ubuntu-latest
             variant: Sleep
-            tests: Test_Sleep and gtest
+            tests: Test_Sleep and test-report
           - os: ubuntu-latest
             variant: Spa
-            tests: Test_Spa and (gtest or arduino_uno_r3)
+            tests: Test_Spa and (test-report or arduino_uno_r3)
           - os: macos-latest
             variant: Disco
-            tests: Test_Disco and gtest
+            tests: Test_Disco and (test-report or test_platform)
 
     steps:
       - name: Checkout Code

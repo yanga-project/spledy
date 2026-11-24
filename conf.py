@@ -115,6 +115,8 @@ myst_url_schemes = ["http", "https", "mailto", "ftp", "source"]
 # Traceability extension
 extensions.append("sphinx_needs")
 extensions.append("sphinx_test_reports")
+# Test specs in the docstrings of pytest test functions, titled `<module>.<function>`.
+extensions.append("yanga.sphinx_pytest")
 
 # needs_types - this option allows the setup of own need types like bugs, user_stories and more.
 needs_types = [
@@ -155,7 +157,10 @@ needs_links = {
         "default": (
             "[[links_from_filter(\"type == 'testcase'"
             " and current_need['title'].split('.')[0] in classname.split('/')"
-            " and case.split('/')[0] == current_need['title'].split('.')[1]\")]]"
+            " and case.split('/')[0] == current_need['title'].split('.')[1]"
+            # A pytest spec titled `<module>.<function>` links every result of that function, parameters included.
+            " or type == 'testcase' and classname == current_need['title'].rpartition('.')[0]"
+            " and case.split('[')[0] == current_need['title'].rpartition('.')[2]\")]]"
         ),
     },
 }

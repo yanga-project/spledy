@@ -11,8 +11,11 @@ variants:
   - framework: gtest
     sources:
     - test_disco.cc
+  - framework: pytest
+    sources:
+    - test_disco_variant.py
   platforms:
-    gtest:
+    test:
       components: [test_integrations_spled]
     arduino_uno_r3:
       components: [arduino_button, arduino_led]
