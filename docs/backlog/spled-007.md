@@ -1,5 +1,5 @@
 ---
-status: In Progress
+status: Done (2026-11-26)
 priority: Medium
 ---
 
@@ -61,14 +61,14 @@ sphinx-needs (9.2 and later) validates needs against schema rules during the bui
 
 ## Acceptance criteria
 
-- [ ] The Disco variant report on the `test` platform and the `light_controller` component report each have a Traceability Report page that lists every finding with the need (linked), its type, the rule, the severity and the rule's message, plus a count per rule.
-- [ ] A report with no findings says so on its page: the extension test renders an empty findings sample and gets the "no findings" line.
-- [ ] The Disco report build succeeds despite findings.
-- [ ] The Disco variant report on `pc_terminal`, which has no test results, has a Reports chapter whose only entry is the Traceability Report page: checked in `test/test_Disco.py` on the existing `pc_terminal` report build.
-- [ ] A test fails when the rule name can no longer be read from the findings file.
-- [ ] A how-to page next to the other how-to pages describes the rules and the page.
-- [ ] `pytest test` passes.
-- [ ] UAT: the human opens the Traceability Report page of the Disco variant report and confirms that it shows the findings of that variant, including the untested `SWDD_LC-200` to `-202`.
+- [x] The Disco variant report on the `test` platform and the `light_controller` component report each have a Traceability Report page that lists every finding with the need (linked), its type, the rule, the severity and the rule's message, plus a count per rule.
+- [x] A report with no findings says so on its page: the extension test renders an empty findings sample and gets the "no findings" line.
+- [x] The Disco report build succeeds despite findings.
+- [x] The Disco variant report on `pc_terminal`, which has no test results, has a Reports chapter whose only entry is the Traceability Report page: checked in `test/test_Disco.py` on the existing `pc_terminal` report build.
+- [x] A test fails when the rule name can no longer be read from the findings file.
+- [x] A how-to page next to the other how-to pages describes the rules and the page.
+- [x] `pytest test` passes.
+- [x] UAT: the human opens the Traceability Report page of the Disco variant report and confirms that it shows the findings of that variant, including the untested `SWDD_LC-200` (`-201` and `-202` are tested by the pytest tests since SPLED-008).
 
 ## Plan
 

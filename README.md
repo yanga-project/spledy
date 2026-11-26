@@ -59,6 +59,8 @@ How every push to `develop` publishes the overview to <https://yanga-project.dev
 
 What to do when a macOS host build stops with `ld: tapi error: malformed file` is in [doc/how-to/fix-the-macos-tapi-error.md](doc/how-to/fix-the-macos-tapi-error.md).
 
+What the Traceability Report page of a report shows and which rules it checks is in [doc/how-to/check-traceability.md](doc/how-to/check-traceability.md).
+
 How to use each platform (the Python shared library, the Zephyr simulator, flashing the ESP32-H2) is in [doc/platforms](doc/platforms/index.md).
 
 ## Credits

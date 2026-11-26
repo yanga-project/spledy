@@ -10,8 +10,6 @@
 
 ### In Progress
 
-- [SPLED-007 — Traceability report page in the variant and component reports](spled-007.md)
-
 ### Blocked
 
 ### Ready

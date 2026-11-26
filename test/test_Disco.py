@@ -1,3 +1,4 @@
+import json
 import re
 import sys
 from pathlib import Path
@@ -365,4 +366,34 @@ class Test_Disco:
         sections = re.findall(r"<h2\b[^>]*>([^<]*)<", html)
 
         # Assert
-        assert sections == ["All components", "All containers", "Variant", "Overall"]
+        assert sections == ["All components", "All containers", "Variant", "Overall", "Traceability"]
+
+    @pytest.mark.parametrize("report", ["reports", "light_controller/reports"])
+    def test_platform_traceability_page_lists_the_findings_per_rule(self, test_platform_build_dir: Path, report: str):
+        # Arrange
+        reports = test_platform_build_dir / report
+        rules = {"test-results-required", "test-traces-to-spec", "impl-traces-to-spec", "spec-is-tested", "spec-is-implemented"}
+
+        # Act
+        findings = json.loads((reports / "schema_violations.json").read_text(encoding="utf-8"))["validation_warnings"]
+        html = (reports / "doc/traceability.html").read_text(encoding="utf-8")
+        counts = dict(re.findall(r"<tr[^>]*>\s*<td><p>([\w-]+)</p></td>\s*<td><p>(\d+)</p></td>\s*</tr>", html))
+
+        # Assert
+        assert findings, f"No findings in {reports}"
+        # The page reads each finding's rule from its schema_path; a rule it cannot read is not one of conf.py's.
+        assert counts and set(counts) <= rules, f"Rules the page could not read: {set(counts) - rules}"
+        assert sum(map(int, counts.values())) == sum(map(len, findings.values()))
+        for need in findings:
+            assert re.search(rf'<a\b[^>]*href="[^"]*#{re.escape(need)}"', html), f"{need} is not linked"
+
+    def test_pc_terminal_reports_chapter_has_only_the_traceability_page(self, pc_terminal_build_dir: Path):
+        # Arrange
+        reports = pc_terminal_build_dir / "reports"
+
+        # Act
+        sections = re.findall(r"<h2\b[^>]*>([^<]*)<", (reports / "doc/reports.html").read_text(encoding="utf-8"))
+
+        # Assert
+        assert sections == ["Traceability"]
+        assert (reports / "doc/traceability.html").is_file()

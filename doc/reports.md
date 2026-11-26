@@ -19,3 +19,11 @@
 ```
 
 {% endfor %}
+
+## Traceability
+
+```{toctree}
+:maxdepth: 1
+
+/doc/traceability
+```

@@ -12,7 +12,7 @@ dependencies = [
     "pypeline-semantic-release>=0.5.1,<0.6.0",
     "sphinx-rtd-theme>=3.1,<4",
     "sphinxcontrib-mermaid>=2.0,<3",
-    "sphinx-needs>=9.1,<10",
+    "sphinx-needs>=9.3,<10",
     "sphinx-test-reports>=3.0.1,<4",
     "sphinx-rtd-size>=0.2,<1",
     "sphinxcontrib-plantuml>=0.29,<1",
@@ -31,7 +31,7 @@ create_yanga_build_dir = true
 exclude_dirs = [".yanga"]
 
 [tool.pytest.ini_options]
-pythonpath = ["test", "platforms/pc_gui", "pipeline"]
+pythonpath = ["test", "platforms/pc_gui", "pipeline", "doc/_ext"]
 testpaths = ["test"]
 junit_logging = "all"
 addopts = [

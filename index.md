@@ -9,6 +9,12 @@
 
 {{ report_data.create_component_myst_toc(report_data.component_name) }}
 
+```{toctree}
+:maxdepth: 1
+
+/doc/traceability
+```
+
 {% elif report_data.has_spl_scope %}
 
 # {{ report_data.project_name }} - Product Line Documentation
@@ -46,9 +52,7 @@
 {% for file in report_data.files("variant", "configuration") %}
 {{ file }}
 {% endfor %}
-{% if report_data.files("merged") or report_data.files("variant", "test") or report_data.files("variant", "coverage") or report_data.files("overall") %}
 /doc/reports
-{% endif %}
 {% for file in report_data.untagged() %}
 {{ file }}
 {% endfor %}
