@@ -1,5 +1,5 @@
 ---
-status: Open
+status: In Progress
 priority: Medium
 blocked_by: [SPLED-007]
 ---
@@ -39,6 +39,13 @@ The direction and the reasoning are in the vault idea `spledy-full-traceability-
 - Security analysis, hardware and system level work products.
 - A mapping page to any standard.
 
+## What users see
+
+- **New need types and links in `conf.py`.** Types: customer requirement, feature, hazard, safety goal, software requirement (the unused `req` type becomes it), architecture element and variant test spec; `spec`, `impl` and `test` stay. Links: `satisfies` (feature to customer requirement, software requirement to feature or safety goal), `arises_from` (hazard to feature), `mitigates` (safety goal to hazard), `realises` (architecture element to software requirement), `refines` (spec to architecture element); the variant test spec uses the existing `tests` and `results`. Not breaking: existing needs keep their links. UAT: no, covered by the pages below. Why: sphinx-needs knows only the types and links a project declares. Approved by the human (2026-11-26)
+- **The product line documentation and the variant reports get new chapters:** Customer Requirements (replaced), Features, Hazard Analysis, Software Requirements and Software Architecture (replaced, arc42 section 5 only). Breaking for readers of the old placeholder pages, which go away. UAT: yes, the Disco variant report and the product line documentation. Why: the placeholders hold no needs to link to. Approved by the human (2026-11-26)
+- **The fastest blink of a blinking variant gets slower.** Today the light switches every 10 task cycles of 10 ms, which is 5 flashes per second at the knob's top position; the safety requirement allows at most 3 (WCAG 2.2, success criterion 2.3.1). The minimum blink period rises to 170 ms. Breaking: Disco blinks visibly slower at the top knob positions. UAT: yes, on `pc_gui`. Why: the safety goal is only true if the code meets it. Approved by the human (2026-11-26)
+- **More findings on the Traceability Report page**, from the rules of the new links and the gaps left on purpose. Not breaking: findings never fail the build. UAT: no, covered by the variant test. Why: the page is how a reader sees the gaps. Approved by the human (2026-11-26)
+
 ## Acceptance criteria
 
 - [ ] The Disco gtest variant report shows one need of each level for `BLINKING` (two software requirements, one functional and one safety), checked by their IDs in the built HTML. Their links are checked by the schema rules (see the traceability criterion below).
@@ -47,3 +54,17 @@ The direction and the reasoning are in the vault idea `spledy-full-traceability-
 - [ ] The SPLED-007 traceability page of the Disco report shows a finding for each gap left on purpose and no other finding for the new levels, checked by a test. So every other need of the slice has the upward links of the Levels decision.
 - [ ] The customer requirements are needs with unique IDs, and the software architecture page uses the arc42 section names, checked by reading the SPL documentation report.
 - [ ] `pytest test` passes.
+- [ ] UAT: the human reads the chain for `BLINKING` in the Disco variant report and in the product line documentation, and sees the slower fastest blink on `pc_gui`.
+
+## Plan
+
+1. `conf.py`: the need types and links of What users see, the ASPICE comments reworded to name the levels, and one schema rule per new link (missing upward link `violation`, wrong level by `items` on that link field), plus `swreq-is-tested` (`warning`: a software requirement is tested by a variant test spec). Check: a Disco report build writes the rules into `schema_violations.json`.
+2. Customer requirements: `doc/customer_requirements/index.md` replaced by needs; for this slice the Disco customer's requirement for a blinking light, inside the `BLINKING` condition. Check: unique IDs, built in the product line documentation.
+3. `doc/features/index.md`: the `BLINKING` feature need, written by hand, `satisfies` the customer requirement and carries a `source:` link to the `config BLINKING` line of `KConfig`; inside the `BLINKING` condition in the variant report and always in the product line documentation.
+4. `doc/hazard_analysis/index.md`: the hazard "flashing light triggers a photosensitive seizure" `arises_from` `BLINKING`, and the safety goal "the light flashes at most 3 times in any one second" `mitigates` it, citing WCAG 2.2 SC 2.3.1 by URL. The guideline is written for screens; applying it to a lamp is our inference, said in the need.
+5. `doc/software_requirements/index.md`: one functional requirement (the blink period follows the main knob) `satisfies` `BLINKING`, one safety requirement (the light toggles no faster than every 170 ms) `satisfies` the safety goal.
+6. `doc/software_architecture/index.md`: replaced by arc42 section 5, building block view, with the `light_controller` component and the `RteGetMainKnobValue` interface as architecture elements that `realise` the two software requirements. In the product line documentation every component of the pool is listed; in the variant report only the selected ones.
+7. `components/light_controller`: `SWDD_LC-101` and `-203` `refine` the architecture elements; a new spec for the minimum blink period; `calculateBlinkPeriod` keeps at least 170 ms, computed from `CONFIG_OS_TASK_PERIOD`; the unit tests follow the new minimum (gtest and pytest).
+8. `variants/Disco/test_disco_variant.py`: a variant test that turns the knob to 100 and counts the light changes over one second, with a test spec in its docstring that `tests` the safety requirement and links its result.
+9. Gaps on purpose: the functional software requirement gets no variant test, so `swreq-is-tested` reports it; a source comment at the need says it is on purpose.
+10. `test/test_Disco.py`, `test/test_Sleep.py`, `test/test_Spa.py`: the need IDs of the slice are in the Disco report HTML and in none of Sleep's or Spa's; the Disco Traceability Report page shows the gap on purpose and no other finding for the new rules; the product line documentation uses the arc42 section name. Check: `pytest test`. The human does the UATs.
