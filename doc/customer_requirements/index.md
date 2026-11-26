@@ -1,28 +1,15 @@
 # Customer Requirements
 
-## Customer A - Disco Light
+What each customer of the product line asks for, one need per requirement. The software requirements
+link to the customer requirements they satisfy.
 
-Customer A requests a Disco Light that shall offer an ambient lighting experience that resonates with the rhythm of the surroundings.
+{# A customer requirement belongs to the customer of a variant, so the variant decides, not a feature. #}
+{% if report_data.has_spl_scope or report_data.variant_name == "Disco" %}
+## Customer A: Disco Light
 
-* RQ-1: The lighting shall automatically sync with any ambient music, adjusting its blink rate to match the beats or rhythm.
-* RQ-2: Users shall have the freedom to choose a specific color for the light. However, in the absence of a user-defined color, the software shall delight the user with randomized colors, ensuring an authentic disco experience.
-* RQ-3: As the essence of a disco environment is dynamic and lively, light transitions shall happen instantaneously without any lag.
-* RQ-4: The illumination provided shall be vibrant and noticeable, ranging from medium to high levels to keep up with the lively ambiance of disco settings.
+```{custreq} Blinking light
+:id: CR_DISCO-001
 
-## Customer B - Sleep Light
-
-Customer B requests a sleep light offering an ambient lighting experience that facilitate a calm and restful environment.
-
-* RQ-1: The light emitted shall be constant without any blink, ensuring a non-disruptive environment for rest.
-* RQ-2: Color of the light shall be fixed to a warm white, known for its soothing and calming properties.
-* RQ-3: The brightness of the light shall be adjustable.
-* RQ-4: The light color shall be blue.
-
-## Customer C - Spa Light
-
-Customer C requests a spa light encapsulating a tranquil and rejuvenating experience, reminiscent of real-world spa environments.
-
-* RQ-1: The light shall have a slow, rhythmic blink that gives a sensation of calm and peace.
-* RQ-2: Instead of a single color, the lighting shall cycle through multiple predefined colors that are commonly associated with relaxation and tranquility.
-* RQ-3: Transitions between colors shall be smooth and seamless, ensuring a continuous flow of relaxation.
-* RQ-4: The brightness of the light shall be adjustable.
+While the light is on, it blinks, and the user sets how fast it blinks with the main knob.
+```
+{% endif %}

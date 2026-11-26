@@ -13,12 +13,12 @@ from light_controller_binding import PowerState
 # KConfigGen writes the variant's feature selection to <build>/kconfig/autoconf.json; the binding is in <build>/light_controller.
 FEATURES = json.loads((Path(light_controller_binding.__file__).parents[1] / "kconfig" / "autoconf.json").read_text())
 if FEATURES["BLINKING"]:
-    @pytest.mark.parametrize(("main_knob_value", "blink_period"), [(30, 70), (95, 10)])
+    @pytest.mark.parametrize(("main_knob_value", "blink_period"), [(30, 70), (95, 17)])
     def test_blink_period_follows_the_main_knob_down_to_a_minimum(main_knob_value: int, blink_period: int) -> None:
         """
         .. test:: {{ pytest.test }}
            :id: TS_LC-007
-           :tests: SWDD_LC-101
+           :tests: SWDD_LC-101, SWDD_LC-104
         """
         lib = light_controller_binding.load()
 

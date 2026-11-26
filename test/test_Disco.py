@@ -27,6 +27,32 @@ IS_CI = any(detector.detect() for system in CISystem if (detector := system.get_
 VARIANT_COVERAGE_PAGE_LINK = re.compile(r'<a\b[^>]*\bhref="\.\./([^"]*/variant_test_coverage\.html)"')
 # The Coverage page's link to the gcovr report of the variant test.
 VARIANT_TEST_COVERAGE_LINK = re.compile(r'<a\b[^>]*\bhref="(?:\.\./)+variant_test_coverage/index\.html"')
+# One need of each level of the blinking chain, from the customer requirement to the variant test spec.
+BLINKING_CHAIN = [
+    "CR_DISCO-001",
+    "FEAT_BLINKING",
+    "HAZ_BLINK-001",
+    "SG_BLINK-001",
+    "SWRS_BLINK-001",
+    "SWRS_BLINK-002",
+    "ARCH_LC",
+    "ARCH_RTE_MAIN_KNOB",
+    "SWDD_LC-101",
+    "SWDD_LC-104",
+    "SWIMPL_LC-004",
+    "TS_LC-004",
+    "VT_DISCO-001",
+]
+# The rules of the levels above the detailed design, and the one finding left on purpose among them.
+CHAIN_RULES = {
+    "hazard-arises-from-req",
+    "safetygoal-mitigates-hazard",
+    "req-satisfies-custreq-or-safetygoal",
+    "arch-realises-req",
+    "vtest-traces-to-req",
+    "req-is-tested",
+}
+GAPS_ON_PURPOSE = {("SWRS_BLINK-001", "req-is-tested")}
 # The tokens that give a sphinx page its section nesting: a section opens, a section closes, a heading names it.
 SECTION_TOKEN = re.compile(r"<section\b[^>]*>|</section>|<h[1-6]\b[^>]*>([^<]*)")
 TAG = re.compile(r"<[^>]+>")
@@ -306,9 +332,13 @@ class Test_Disco:
         # Assert
         assert entries == [
             "Customer Requirements",
+            "Features",
+            "Hazard Analysis",
+            "Software Requirements",
             "Software Architecture",
             "Components",
             "Containers",
+            "Variant Test Specification",
             "Variant Feature Configuration",
             "Reports",
             "Build Targets",
@@ -372,7 +402,7 @@ class Test_Disco:
     def test_platform_traceability_page_lists_the_findings_per_rule(self, test_platform_build_dir: Path, report: str):
         # Arrange
         reports = test_platform_build_dir / report
-        rules = {"test-results-required", "test-traces-to-spec", "impl-traces-to-spec", "spec-is-tested", "spec-is-implemented"}
+        rules = {"test-results-required", "test-traces-to-spec", "impl-traces-to-spec", "spec-is-tested", "spec-is-implemented", "spec-refines-arch", "spec-realises-only-req"} | CHAIN_RULES
 
         # Act
         findings = json.loads((reports / "schema_violations.json").read_text(encoding="utf-8"))["validation_warnings"]
@@ -386,6 +416,35 @@ class Test_Disco:
         assert sum(map(int, counts.values())) == sum(map(len, findings.values()))
         for need in findings:
             assert re.search(rf'<a\b[^>]*href="[^"]*#{re.escape(need)}"', html), f"{need} is not linked"
+
+    def test_platform_report_has_the_blinking_chain(self, test_platform_build_dir: Path):
+        # Arrange
+        pages = (test_platform_build_dir / "reports").rglob("*.html")
+
+        # Act
+        ids = {need_id for page in pages for need_id in re.findall(r'\bid="([^"]+)"', page.read_text(encoding="utf-8"))}
+
+        # Assert
+        assert [need for need in BLINKING_CHAIN if need not in ids] == []
+
+    def test_platform_traceability_page_shows_only_the_gaps_on_purpose_for_the_chain(self, test_platform_build_dir: Path):
+        # Arrange
+        findings_file = test_platform_build_dir / "reports/schema_violations.json"
+
+        # Act
+        findings = json.loads(findings_file.read_text(encoding="utf-8"))["validation_warnings"]
+        chain_findings = {
+            (need, rule)
+            for need, warnings in findings.items()
+            for warning in warnings
+            if (rule := re.sub(r"\[\d+\]$", "", warning["details"]["schema_path"].split(" > ")[0])) in CHAIN_RULES
+        }
+        html = (test_platform_build_dir / "reports/doc/traceability.html").read_text(encoding="utf-8")
+
+        # Assert
+        assert chain_findings == GAPS_ON_PURPOSE
+        assert "VT_DISCO-001" not in findings, "The variant test spec has a finding, for example no result"
+        assert all(need in html for need, _ in GAPS_ON_PURPOSE)
 
     def test_pc_terminal_reports_chapter_has_only_the_traceability_page(self, pc_terminal_build_dir: Path):
         # Arrange

@@ -102,3 +102,36 @@ def test_overview_shows_the_product_line_documentation_above_the_variants(overvi
     # Assert
     assert heading, "The overview has no Product line documentation section"
     assert heading.start() < html.index('<article class="card"'), "Product line documentation is not above the variant cards"
+
+
+# The needs that only a blinking variant has: the blinking chain without the light_controller component element.
+BLINKING_ONLY = ["CR_DISCO-001", "FEAT_BLINKING", "HAZ_BLINK-001", "SG_BLINK-001", "SWRS_BLINK-001", "SWRS_BLINK-002", "ARCH_RTE_MAIN_KNOB", "SWDD_LC-101", "SWDD_LC-104", "VT_DISCO-001"]
+
+
+@pytest.mark.parametrize("variant", ["Sleep", "Spa"])
+def test_variant_without_blinking_has_none_of_the_blinking_needs(overview_file: Path, variant: str) -> None:
+    # Arrange
+    pages = (overview_file.parent / "variants" / variant / "test/reports").rglob("*.html")
+
+    # Act
+    ids = {need_id for page in pages for need_id in re.findall(r'\bid="([^"]+)"', page.read_text(encoding="utf-8"))}
+
+    # Assert
+    assert ids, f"No report pages for {variant}"
+    assert [need for need in BLINKING_ONLY if need in ids] == []
+
+
+def test_product_line_documentation_has_the_chain_and_the_arc42_section(overview_file: Path) -> None:
+    # Arrange
+    doc = overview_file.parent / "spl/reports/doc"
+
+    # Act
+    requirements = (doc / "customer_requirements/index.html").read_text(encoding="utf-8")
+    architecture = (doc / "software_architecture/index.html").read_text(encoding="utf-8")
+
+    # Assert
+    requirement_ids = re.findall(r'\bid="(CR_[^"]+)"', requirements)
+    assert requirement_ids and len(requirement_ids) == len(set(requirement_ids)), requirement_ids
+    assert re.search(r"<h2\b[^>]*>5 Building Block View<", architecture), "No arc42 section 5 on the architecture page"
+    assert 'id="ARCH_LC"' in architecture
+    assert not (doc / "variant_tests").exists(), "The product line documentation has the variant tests"

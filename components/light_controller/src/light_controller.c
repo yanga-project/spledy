@@ -168,20 +168,23 @@ static void turnLightOn(void)
 }
 
 #if CONFIG_BLINKING
+#define MIN_BLINK_PERIOD_MS 170u
+#define MIN_BLINK_PERIOD_CYCLES ((MIN_BLINK_PERIOD_MS + CONFIG_OS_TASK_PERIOD - 1u) / CONFIG_OS_TASK_PERIOD)
+
 /**
  *
  * @trace Calculate blink period
  * type: impl
  * id: SWIMPL_LC-004
- * implements: SWDD_LC-101
+ * implements: SWDD_LC-101, SWDD_LC-104
  */
 SPLE_TESTABLE_STATIC unsigned int calculateBlinkPeriod(percentage_t mainKnobValue)
 {
     // Calculate blink period based on main knob value
     unsigned int blinkPeriod = 100 - (mainKnobValue); // Adjust this formula as needed
 
-    // Ensure there's a minimum blink period
-    blinkPeriod = (blinkPeriod > 10) ? blinkPeriod : 10; // Adjust the minimum period as needed
+    // At least MIN_BLINK_PERIOD_MS, in task cycles rounded up, so the light flashes at most three times a second
+    blinkPeriod = (blinkPeriod > MIN_BLINK_PERIOD_CYCLES) ? blinkPeriod : MIN_BLINK_PERIOD_CYCLES;
 
     return blinkPeriod;
 }

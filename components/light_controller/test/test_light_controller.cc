@@ -225,7 +225,7 @@ std::ostream &operator<<(std::ostream &os, const TestParam &param)
  * @trace {{ gtest.test }}
  * type: test
  * id: TS_LC-004
- * tests: SWDD_LC-101
+ * tests: SWDD_LC-101, SWDD_LC-104
  */
 TEST(light_controller, test_correct_blink_period)
 {
@@ -235,7 +235,7 @@ TEST(light_controller, test_correct_blink_period)
     std::vector<TestParam> test_data = {
         {"Slowest", 0, 100},
         {"Inbetween", 50, 50},
-        {"Fastest", 100, 10}};
+        {"Fastest", 100, 17}};
 
     for (const auto &param : test_data)
     {
@@ -248,7 +248,7 @@ TEST(light_controller, test_correct_blink_period)
  * @trace {{ gtest.test }}
  * type: test
  * id: TS_LC-003
- * tests: SWDD_LC-101
+ * tests: SWDD_LC-101, SWDD_LC-104
  */
 TEST_P(BlinkPeriodTest, CalculatesCorrectBlinkPeriod)
 {
@@ -266,6 +266,6 @@ INSTANTIATE_TEST_SUITE_P(
     Values(
         TestParam{"Slowest", 0, 100},
         TestParam{"Inbetween", 50, 50},
-        TestParam{"Fastest", 100, 10}));
+        TestParam{"Fastest", 100, 17}));
 
 #endif // CONFIG_BLINKING

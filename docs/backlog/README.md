@@ -10,8 +10,6 @@
 
 ### In Progress
 
-- [SPLED-009 — Full trace chain for the blinking feature, from customer requirement to test result](spled-009.md)
-
 ### Blocked
 
 ### Ready

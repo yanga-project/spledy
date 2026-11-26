@@ -26,7 +26,11 @@
 :caption: Contents
 
 /doc/customer_requirements/index
+/doc/features/index
+/doc/hazard_analysis/index
+/doc/software_requirements/index
 /doc/software_architecture/index
+/doc/trace_model
 /doc/platforms/index
 ```
 
@@ -44,11 +48,15 @@
 :caption: Contents
 
 /doc/customer_requirements/index
+/doc/features/index
+/doc/hazard_analysis/index
+/doc/software_requirements/index
 /doc/software_architecture/index
 /doc/components
 {% if report_data.files("container") %}
 /doc/containers
 {% endif %}
+/doc/variant_tests/index
 {% for file in report_data.files("variant", "configuration") %}
 {{ file }}
 {% endfor %}
